@@ -137,9 +137,9 @@ class MakePdf extends AbstractMake
      */
     private function addElabid(): string
     {
-        if ($this->Entity instanceof Experiments) {
-            return "<p class='elabid'>Unique eLabID: " . $this->Entity->entityData['elabid'] . '</p>';
-        }
+        //if ($this->Entity instanceof Experiments) {
+        // return "<p class='elabid'>Unique eLabID: " . $this->Entity->entityData['elabid'] . '</p>';
+        //}
         return '';
     }
 
@@ -271,16 +271,18 @@ class MakePdf extends AbstractMake
 
             foreach ($uploadsArr as $upload) {
                 // the name of the file
-                $html .= "<p class='pdf-ul'>" . $upload['real_name'];
+                $html .= "<div class='pdf-ul'>";
                 // add a comment ? don't add if it's the default text
                 if ($upload['comment'] != 'Click to add a comment') {
-                    $html .= ' (' . $upload['comment'] . ')';
+                    $html .= '<i>' . $upload['comment'] . '</i>';
+                } else {
+                    $html .= $upload['real_name'];
                 }
                 // add hash ? don't add if we don't have it
                 // length must be greater (sha2 hashes) or equal (md5) 32 bits
-                if (\mb_strlen((string) $upload['hash']) >= 32) { // we have hash
-                    $html .= '<br>' . $upload['hash_algorithm'] . ' : ' . $upload['hash'];
-                }
+                //if (\mb_strlen((string) $upload['hash']) >= 32) { // we have hash
+                //$html .= '<br>' . $upload['hash_algorithm'] . ' : ' . $upload['hash'];
+                //}
                 // if this is an image file, add the thumbnail picture
                 $ext = Tools::getExt($upload['real_name']);
                 $filePath = \dirname(__DIR__, 2) . '/uploads/' . $upload['long_name'];
@@ -292,7 +294,7 @@ class MakePdf extends AbstractMake
                     $html .= "<br /><img class='attached-image' src='" . $filePath . "' alt='attached image' />";
                 }
 
-                $html .= '</p>';
+                $html .= '</div>';
             }
             $html .= '</section>';
         }
@@ -336,7 +338,7 @@ class MakePdf extends AbstractMake
     private function addUrl(): string
     {
         $full_url = $this->getUrl();
-        return "<p class='elabid'>link : <a href='" . $full_url . "'>" . $full_url . '</a></p>';
+        return "<p class='elabid'>RoH ELN link: <a href='" . $full_url . "'>" . $full_url . '</a></p>';
     }
 
     /**
@@ -408,22 +410,19 @@ Witness' signature:<br><br>
 <body' . $cjkStyle . '>
 <htmlpageheader name="header">
     <div id="header">
-        <h1>' . $this->Entity->entityData['title'] . '</h1>
-        <p style="float:left; width:90%;">
-            <strong>Date:</strong> ' . $date->format('Y-m-d') . '<br />
-            <strong>Tags:</strong> <em>' .
-                \str_replace('|', ' ', $this->Entity->entityData['tags']) . '</em> <br />
-            <strong>Created by:</strong> ' . $this->Entity->entityData['fullname'] . '
-        </p>
-        <p style="float:right; width:10%;"><br /><br />
+        <h1 style="color:#e20000">' . $this->Entity->entityData['title'] . '</h1>
+        <div style="float:left; width:90%;">
+            <strong>Date:</strong> ' . $date->format('Y-m-d') . '
+        </div>
+        <div style="float:right; width:10%;">
             {PAGENO} / {nbpg}
-        </p>
+        </div>
     </div>
 </htmlpageheader>
 <htmlpagefooter name="footer">' . $pdfSig . '
-    <div class="footer-block footer">
-        PDF generated with <a href="https://www.elabftw.net">elabftw</a>, a free and open source lab notebook
-        <p style="font-size:6pt;">File generated on {DATE d-m-Y} at {DATE H:m}</p>
+<div class="footer-block footer">
+        A product of FTC 4216, Rise of Hephaestus.
+<p style="font-size:6pt;">Thanks sponsors! Qualcomm, DoDSTEM, RISE, robo, San Diego STEAMMaker Fest, HiTec, goBilda, The Sempra Foundation, The Vertex Foundation, Three Guys Properties
     </div>
 </htmlpagefooter>
 ';
